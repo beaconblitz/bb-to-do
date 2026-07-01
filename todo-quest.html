@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beaconblitz TodoQuest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  :root{
+    --bg:#10151f;
+    --surface:#1b2240;
+    --surface-2:#26315d;
+    --primary:#22d3ee;
+    --primary-dark:#2563eb;
+    --primary-light:#15375d;
+    --gold:#facc15;
+    --gold-light:#4d3512;
+    --success:#34d399;
+    --success-light:#133c2f;
+    --danger:#fb7185;
+    --danger-light:#4a1828;
+    --text:#fffaff;
+    --muted:#c5d0e6;
+    --border:#4b5b93;
+    --radius:8px;
+    --bronze:#d98443;
+    --silver:#bec7d2;
+    --diamond:#59d8ff;
+    --xp:#a3e635;
+    --pink:#ec4899;
+    --violet:#8b5cf6;
+    --orange:#fb923c;
+    --shadow:0 18px 40px rgba(0,0,0,.34);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:
+      linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px),
+      radial-gradient(circle at 12% 18%, rgba(236,72,153,.28) 0%, transparent 26%),
+      radial-gradient(circle at 82% 14%, rgba(34,211,238,.24) 0%, transparent 30%),
+      radial-gradient(circle at 48% 88%, rgba(250,204,21,.2) 0%, transparent 30%),
+      linear-gradient(135deg,#121832 0%,#2d1b69 34%,#0f766e 68%,#451a03 100%);
+    background-size:44px 44px,44px 44px,160% 160%,160% 160%,160% 160%,300% 300%;
+    animation:bgShift 14s ease-in-out infinite;
+    min-height:100vh;
+    color:var(--text);
+  }
+  @keyframes bgShift{
+    0%,100%{background-position:0 0,0 0,0% 20%,100% 0%,40% 100%,0% 50%;}
+    50%{background-position:22px 22px,22px 22px,90% 60%,10% 70%,80% 20%,100% 50%;}
+  }
+  h1,h2,h3,.brand{font-family:'Sora',sans-serif;}
+  .app{max-width:1060px;margin:0 auto;padding:24px 18px 60px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+  .brand{font-size:22px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:9px;text-shadow:0 3px 0 rgba(0,0,0,.18);}
+  .brand .dot{width:16px;height:16px;border-radius:4px;background:linear-gradient(135deg,var(--gold),var(--pink),var(--primary));display:inline-block;box-shadow:0 0 18px rgba(34,211,238,.65);animation:spinGem 4s linear infinite;}
+  @keyframes spinGem{to{transform:rotate(360deg);}}
+  .btn{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:14px;
+    border:1.5px solid rgba(255,255,255,.12);border-radius:8px;padding:11px 18px;cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+    text-transform:uppercase;letter-spacing:.02em;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.6);transform:none;box-shadow:none;}
+  .btn-primary{background:linear-gradient(90deg,var(--primary),var(--violet),var(--pink),var(--orange));background-size:240% 100%;color:#06121d;box-shadow:0 5px 0 #075985,0 12px 24px rgba(56,189,248,.22);animation:buttonGlow 5s ease infinite;}
+  @keyframes buttonGlow{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
+  .btn-primary:hover{filter:brightness(1.06);}
+  .btn-ghost{background:rgba(255,255,255,.05);color:var(--text);border:1.5px solid var(--border);}
+  .btn-ghost:hover{border-color:var(--primary);color:var(--primary);}
+  .btn-success{background:linear-gradient(180deg,#5df0af,#16a36f);color:#061b12;box-shadow:0 4px 0 #08734b;}
+  .btn-danger{background:transparent;color:var(--danger);}
+  .btn-sm{padding:7px 12px;font-size:12.5px;}
+  .btn-block{width:100%;}
+  input,textarea,select{
+    font-family:'Inter',sans-serif;font-size:14px;
+    border:1.5px solid var(--border);border-radius:8px;padding:11px 13px;
+    width:100%;background:#111927;color:var(--text);outline:none;
+  }
+  input:focus,textarea:focus,select:focus{border-color:var(--primary);}
+  label{font-size:12.5px;font-weight:700;color:var(--gold);display:block;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.04em;}
+  .card{background:linear-gradient(180deg,rgba(38,49,93,.95),rgba(27,34,64,.96));border-radius:var(--radius);border:1px solid var(--border);padding:22px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+  .card::before{
+    content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
+    background:linear-gradient(120deg,var(--primary),var(--gold),var(--pink),var(--violet));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;
+    animation:borderDance 7s linear infinite;
+  }
+  @keyframes borderDance{to{filter:hue-rotate(360deg);}}
+  .hidden{display:none !important;}
+  .center-screen{min-height:80vh;display:flex;align-items:center;justify-content:center;}
+  .setup-box{max-width:480px;width:100%;}
+  .setup-box p{color:var(--muted);font-size:13.5px;line-height:1.5;margin-bottom:4px;}
+  .staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:14px;margin-top:18px;}
+  .staff-tile{
+    background:linear-gradient(160deg,rgba(34,211,238,.2),rgba(139,92,246,.18),rgba(236,72,153,.16));border:1.5px solid var(--border);border-radius:8px;
+    padding:18px 10px;text-align:center;cursor:pointer;transition:.15s;
+    box-shadow:0 8px 0 rgba(0,0,0,.18);
+  }
+  .staff-tile:hover{border-color:var(--primary);transform:translateY(-3px);box-shadow:0 11px 0 rgba(0,0,0,.18),0 0 24px rgba(56,189,248,.16);}
+  .avatar{
+    width:56px;height:56px;border-radius:8px;margin:0 auto 10px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Sora',sans-serif;font-weight:700;font-size:19px;color:#fff;
+  }
+  .staff-tile .name{font-weight:600;font-size:13.5px;}
+  .staff-tile .coins{font-size:11.5px;color:var(--gold);font-weight:700;margin-top:4px;}
+  .login-header{text-align:center;margin-bottom:6px;}
+  .login-header h1{font-size:32px;color:var(--text);text-shadow:0 4px 0 rgba(0,0,0,.25);}
+  .login-header p{color:var(--muted);font-size:13.5px;margin-top:4px;}
+  .admin-link{text-align:center;margin-top:22px;}
+  .admin-link a{color:var(--muted);font-size:12.5px;text-decoration:underline;cursor:pointer;}
+
+  /* dashboard header */
+  .dash-header{
+    background:
+      linear-gradient(120deg,rgba(34,211,238,.32),rgba(139,92,246,.24),rgba(236,72,153,.2),rgba(250,204,21,.16)),
+      linear-gradient(180deg,#2d3566 0%,#171f40 100%);
+    background-size:240% 240%,auto;
+    border:1px solid #40516b;
+    border-radius:8px;padding:24px;color:#fff;margin-bottom:20px;
+    position:relative;overflow:hidden;
+    box-shadow:var(--shadow), inset 0 0 0 1px rgba(255,255,255,.04);
+    animation:panelPulse 8s ease-in-out infinite;
+  }
+  @keyframes panelPulse{0%,100%{background-position:0% 50%,0 0;}50%{background-position:100% 50%,0 0;}}
+  .dash-header::after{
+    content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;
+    background:conic-gradient(from 0deg,rgba(250,204,21,.26),rgba(236,72,153,.16),rgba(34,211,238,.2),rgba(250,204,21,.26));
+    transform:rotate(12deg);animation:haloSpin 9s linear infinite;
+  }
+  @keyframes haloSpin{to{transform:rotate(372deg);}}
+  .dash-header .row1{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1;}
+  .dash-header h2{font-size:20px;}
+  .dash-header .role-tag{font-size:11px;background:rgba(163,230,53,.16);border:1px solid rgba(163,230,53,.34);color:#d9ff99;padding:4px 10px;border-radius:6px;margin-top:6px;display:inline-block;text-transform:uppercase;font-weight:800;}
+  .coin-pill{
+    background:rgba(0,0,0,.24);border:1px solid rgba(248,194,78,.4);border-radius:8px;padding:10px 16px;
+    display:flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:18px;
+  }
+  .coin-pill.bump{animation:bump .4s ease;}
+  @keyframes bump{0%{transform:scale(1);}40%{transform:scale(1.18);}100%{transform:scale(1);}}
+  .coin-icon{width:22px;height:22px;flex-shrink:0;}
+
+  .trophy-shelf{display:flex;gap:10px;margin-top:18px;position:relative;z-index:1;}
+  .trophy-slot{
+    flex:1;background:rgba(0,0,0,.18);border-radius:8px;padding:10px 6px;text-align:center;
+    border:1.5px dashed rgba(255,255,255,.25);
+  }
+  .trophy-slot.unlocked{background:rgba(255,255,255,.18);border-style:solid;border-color:rgba(255,255,255,.4);}
+  .trophy-slot svg{width:26px;height:26px;}
+  .trophy-slot .tlabel{font-size:9.5px;margin-top:4px;opacity:.85;font-weight:600;letter-spacing:.03em;}
+  .progress-wrap{margin-top:14px;position:relative;z-index:1;}
+  .progress-bar{height:12px;background:rgba(0,0,0,.28);border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,.12);}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--xp),var(--gold));border-radius:3px;transition:width .4s ease;}
+  .progress-label{font-size:11px;margin-top:6px;opacity:.85;}
+
+  .tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+  .tab{
+    padding:10px 16px;border-radius:8px;font-size:13.5px;font-weight:800;cursor:pointer;
+    background:rgba(255,255,255,.05);border:1.5px solid var(--border);color:var(--muted);
+    text-transform:uppercase;
+  }
+  .tab.active{background:linear-gradient(180deg,#55d4ff,var(--primary-dark));color:#06121d;border-color:#7ddfff;box-shadow:0 4px 0 #075985;}
+
+  .section-title{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px;}
+  .section-title:first-child{margin-top:0;}
+
+  .task-card{
+    background:linear-gradient(145deg,rgba(34,211,238,.13),rgba(139,92,246,.15),rgba(236,72,153,.1),rgba(27,34,64,.96));border:1px solid var(--border);border-radius:8px;
+    padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+    box-shadow:0 8px 0 rgba(0,0,0,.14);
+  }
+  .task-card.completed{opacity:.65;}
+  .task-card.overdue{border-left:4px solid var(--danger);}
+  .task-card.upcoming{border-left:4px solid var(--gold);}
+  .task-title{font-weight:600;font-size:14.5px;}
+  .task-meta{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .chip{font-size:11px;padding:4px 9px;border-radius:6px;font-weight:800;text-transform:uppercase;}
+  .chip-deadline{background:var(--primary-light);color:#bdefff;}
+  .chip-overdue{background:var(--danger-light);color:var(--danger);}
+  .chip-source{background:#263346;color:var(--muted);}
+  .chip-reward{background:var(--gold-light);color:#ffe09a;}
+  .chip-late{background:#263346;color:var(--muted);}
+  .task-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
+  .empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+  .empty-state .big{font-size:32px;margin-bottom:8px;}
+  .charm-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px;}
+  .charm-badge{
+    min-width:28px;height:28px;padding:3px 7px;border-radius:8px;
+    display:inline-flex;align-items:center;justify-content:center;gap:4px;
+    background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.04));
+    border:1px solid rgba(255,255,255,.18);box-shadow:0 0 14px rgba(255,255,255,.08);
+    font-size:16px;font-weight:800;
+  }
+  .charm-badge.locked{opacity:.34;filter:grayscale(1);}
+  .shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;}
+  .shop-card{
+    background:linear-gradient(145deg,rgba(250,204,21,.13),rgba(34,211,238,.13),rgba(236,72,153,.12));
+    border:1px solid var(--border);border-radius:8px;padding:16px;position:relative;overflow:hidden;
+    box-shadow:0 8px 0 rgba(0,0,0,.14);
+  }
+  .shop-icon{font-size:34px;margin-bottom:8px;text-shadow:0 0 18px rgba(255,255,255,.28);}
+  .shop-name{font-family:'Sora',sans-serif;font-weight:800;font-size:15px;}
+  .shop-cost{color:var(--gold);font-weight:800;font-size:12px;margin:7px 0 12px;text-transform:uppercase;}
+  .shop-owned{color:var(--success);font-weight:800;font-size:12px;text-transform:uppercase;}
+
+  .table-scroll{width:100%;overflow-x:auto;}
+  table{width:100%;min-width:680px;border-collapse:collapse;font-size:13.5px;}
+  th{text-align:left;color:var(--gold);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;padding:8px 10px;border-bottom:1.5px solid var(--border);}
+  td{padding:10px;border-bottom:1px solid var(--border);}
+  tr:last-child td{border-bottom:none;}
+  .lb-rank{font-family:'Sora',sans-serif;font-weight:800;color:var(--primary);width:28px;}
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(6,10,17,.76);display:flex;align-items:center;justify-content:center;
+    padding:20px;z-index:50;
+  }
+  .modal{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--border);border-radius:8px;padding:24px;max-width:380px;width:100%;box-shadow:var(--shadow);}
+  .pin-dots{display:flex;gap:10px;justify-content:center;margin:18px 0;}
+  .pin-dots input{
+    width:46px;height:52px;text-align:center;font-size:22px;font-weight:700;
+  }
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#07111d;color:#fff;padding:12px 22px;border-radius:8px;font-size:13.5px;font-weight:700;
+    box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:100;display:flex;align-items:center;gap:8px;
+  }
+  .footer-nav{display:flex;justify-content:space-between;margin-top:26px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:520px){
+    .grid2{grid-template-columns:1fr;}
+    .app{padding:18px 12px 44px;}
+    .dash-header{padding:18px;}
+    .dash-header .row1{gap:14px;}
+    .coin-pill{padding:8px 10px;font-size:15px;}
+    .trophy-shelf{display:grid;grid-template-columns:1fr 1fr;}
+    .task-card{flex-direction:column;}
+    .task-actions{width:100%;align-items:stretch;}
+    .btn-sm{width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<div id="app" class="app"></div>
+
+<script>
+/* ============ ICONS ============ */
+const coinSVG = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="coin-icon">
+  <circle cx="12" cy="12" r="10" fill="#F5A623"/>
+  <circle cx="12" cy="12" r="7.2" fill="#FFC94D"/>
+  <text x="12" y="16.5" font-family="Sora" font-size="10" font-weight="800" text-anchor="middle" fill="#B8790C">₹</text>
+</svg>`;
+
+function trophySVG(color, locked){
+  const fill = locked ? 'rgba(255,255,255,.25)' : color;
+  return `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M7 4h10v4a5 5 0 0 1-10 0V4z" fill="${fill}"/>
+    <path d="M7 5H4a3 3 0 0 0 3 5V5z" fill="${fill}" opacity="0.8"/>
+    <path d="M17 5h3a3 3 0 0 1-3 5V5z" fill="${fill}" opacity="0.8"/>
+    <rect x="10.5" y="13" width="3" height="4" fill="${fill}"/>
+    <rect x="8" y="17" width="8" height="2.4" rx="1" fill="${fill}"/>
+  </svg>`;
+}
+
+const TROPHIES = [
+  {key:'bronze', label:'Bronze', threshold:5, color:'var(--bronze)'},
+  {key:'silver', label:'Silver', threshold:15, color:'var(--silver)'},
+  {key:'gold', label:'Gold', threshold:30, color:'var(--gold)'},
+  {key:'diamond', label:'Diamond', threshold:50, color:'var(--diamond)'},
+];
+const CHARM_SHOP = [
+  {key:'spark', name:'Spark Star', icon:'⭐', cost:20},
+  {key:'flame', name:'Fire Aura', icon:'🔥', cost:30},
+  {key:'crown', name:'Royal Crown', icon:'👑', cost:50},
+  {key:'rocket', name:'Rocket Boost', icon:'🚀', cost:70},
+  {key:'shield', name:'Power Shield', icon:'🛡️', cost:90},
+  {key:'diamond', name:'Diamond Charm', icon:'💎', cost:120}
+];
+const COINS_PER_TASK = 10;
+
+/* ============ STATE ============ */
+let db = null;
+let currentUser = null; // {id, name, isAdmin}
+let staffCache = {};
+let taskCache = {};
+let activeTab = 'tasks';
+
+/* ============ FIREBASE SETUP ============ */
+function initFirebase(config){
+  try{
+    if(!firebase.apps.length){ firebase.initializeApp(config); }
+    db = firebase.database();
+    localStorage.setItem('bb_todoquest_config', JSON.stringify(config));
+    listenData();
+    renderLogin();
+  }catch(e){
+    alert('Firebase config aayi bandhippikan pattiyilla: ' + e.message);
+  }
+}
+
+function listenData(){
+  db.ref('todoQuest/staff').on('value', snap => {
+    staffCache = snap.val() || {};
+    rerender();
+  });
+  db.ref('todoQuest/tasks').on('value', snap => {
+    taskCache = snap.val() || {};
+    rerender();
+  });
+}
+
+function rerender(){
+  if(!currentUser){ renderLogin(); }
+  else if(currentUser.isAdmin){ renderAdmin(); }
+  else { renderStaffDash(); }
+}
+
+/* ============ HELPERS ============ */
+function avatarColor(name){
+  const colors = ['#4C3AE3','#F5A623','#16A34A','#E23744','#0EA5E9','#A855F7','#EA580C'];
+  let h=0; for(const c of (name||'')) h+=c.charCodeAt(0);
+  return colors[h % colors.length];
+}
+function initials(name){ return (name||'?').trim().split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function fmtDate(ts){
+  if(!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) + ', ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+function todayDateTimeInput(){
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function parseQuestTitles(raw){
+  return raw.split('\n').map(t => t.trim()).filter(Boolean);
+}
+function ownedCharmKeys(staff){
+  const charms = staff?.charms || {};
+  if(Array.isArray(charms)) return charms;
+  return Object.keys(charms).filter(k => charms[k]);
+}
+function renderCharms(staff, compact=false){
+  const owned = ownedCharmKeys(staff);
+  if(!owned.length) return compact ? `<span style="color:var(--muted);font-size:12px;">No charms</span>` : `<div class="charm-row"><span style="color:var(--muted);font-size:12px;">No charms yet</span></div>`;
+  return `<div class="charm-row">${owned.map(key=>{
+    const charm = CHARM_SHOP.find(c=>c.key===key);
+    if(!charm) return '';
+    return `<span class="charm-badge" title="${charm.name}">${charm.icon}</span>`;
+  }).join('')}</div>`;
+}
+function myTasks(staffId){
+  return Object.entries(taskCache).filter(([id,t])=>t.staffId===staffId).map(([id,t])=>({id,...t}));
+}
+function toast(msg){
+  const el = document.createElement('div');
+  el.className='toast'; el.innerHTML = msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 2600);
+}
+function trophyCountFor(staff){
+  return TROPHIES.filter(t => (staff.onTimeCount||0) >= t.threshold).length;
+}
+function nextTrophy(staff){
+  return TROPHIES.find(t => (staff.onTimeCount||0) < t.threshold);
+}
+
+/* ============ RENDER: SETUP ============ */
+function renderSetup(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+  <div class="center-screen">
+    <div class="card setup-box">
+      <h2 style="margin-bottom:10px;color:var(--primary);">⚡ TodoQuest Setup</h2>
+      <p>Beaconblitz Staff system-il use cheyyunna <b>same Firebase config</b> ivide paste cheyyuka. Ith prathekamayi <code>todoQuest/</code> node-il data save cheyyum, ninte existing attendance data-ye touch cheyyilla.</p>
+      <label>Firebase Config (JSON)</label>
+      <textarea id="fbConfigInput" rows="7" placeholder='{"apiKey":"...", "databaseURL":"https://xxx.firebaseio.com", "projectId":"..."}'></textarea>
+      <button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="submitConfig()">Connect & Continue</button>
+    </div>
+  </div>`;
+}
+function submitConfig(){
+  const raw = document.getElementById('fbConfigInput').value.trim();
+  try{
+    const cfg = JSON.parse(raw);
+    initFirebase(cfg);
+  }catch(e){
+    alert('JSON format thett aanu. Firebase console-il ninnu copy cheytha config aano ennu check cheyyuka.');
+  }
+}
+
+/* ============ RENDER: LOGIN ============ */
+function renderLogin(){
+  currentUser = null;
+  const app = document.getElementById('app');
+  const staffList = Object.entries(staffCache);
+  app.innerHTML = `
+  <div class="app" style="padding-top:40px;">
+    <div class="login-header">
+      <h1>⚡ Beaconblitz TodoQuest</h1>
+      <p>Select your player, clear quests, earn coins, and unlock trophies.</p>
+    </div>
+    <div class="staff-grid" id="staffGrid">
+      ${staffList.map(([id,s])=>`
+        <div class="staff-tile" onclick="promptStaffPin('${id}')">
+          <div class="avatar" style="background:${avatarColor(s.name)}">${initials(s.name)}</div>
+          <div class="name">${s.name}</div>
+          <div class="coins">🪙 ${s.coins||0}</div>
+          ${renderCharms(s)}
+        </div>`).join('')}
+    </div>
+    ${staffList.length===0 ? `<div class="empty-state"><div class="big">👋</div>No players yet. Admin can add staff from the control room.</div>` : ''}
+    <div class="admin-link"><a onclick="promptAdminLogin()">Admin Control Room →</a></div>
+  </div>`;
+}
+
+function promptStaffPin(staffId){
+  const staff = staffCache[staffId];
+  showModal(`
+    <h3 style="margin-bottom:4px;">Hi ${staff.name} 👋</h3>
+    <p style="color:var(--muted);font-size:13px;">4-digit PIN nൽkuka</p>
+    <div class="pin-dots">
+      ${[0,1,2,3].map(i=>`<input maxlength="1" inputmode="numeric" id="pin${i}" oninput="if(this.value)document.getElementById('pin${i+1}')?.focus()">`).join('')}
+    </div>
+    <button class="btn btn-primary btn-block" onclick="checkStaffPin('${staffId}')">Login</button>
+  `);
+}
+function checkStaffPin(staffId){
+  const pin = [0,1,2,3].map(i=>document.getElementById('pin'+i).value).join('');
+  const staff = staffCache[staffId];
+  if(pin === (staff.pin || '0000')){
+    currentUser = {id:staffId, name:staff.name, isAdmin:false};
+    closeModal();
+    activeTab='tasks';
+    renderStaffDash();
+  } else {
+    toast('❌ Thettaya PIN');
+  }
+}
+function promptAdminLogin(){
+  showModal(`
+    <h3 style="margin-bottom:12px;">Admin Login</h3>
+    <label style="margin-top:0;">Password</label>
+    <input type="password" id="adminPass" placeholder="Admin password">
+    <button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="checkAdminPass()">Login</button>
+  `);
+}
+function checkAdminPass(){
+  const val = document.getElementById('adminPass').value;
+  db.ref('todoQuest/settings/adminPassword').once('value').then(snap=>{
+    const pass = snap.val() || 'beaconblitz';
+    if(val === pass){
+      currentUser = {id:'admin', name:'Admin', isAdmin:true};
+      closeModal();
+      renderAdmin();
+    } else {
+      toast('❌ Thettaya password');
+    }
+  });
+}
+
+/* ============ MODAL ============ */
+function showModal(innerHtml){
+  const overlay = document.createElement('div');
+  overlay.className='modal-overlay'; overlay.id='modalOverlay';
+  overlay.innerHTML = `<div class="modal">${innerHtml}<div style="text-align:center;margin-top:10px;"><a style="font-size:12.5px;color:var(--muted);cursor:pointer;" onclick="closeModal()">Cancel</a></div></div>`;
+  document.body.appendChild(overlay);
+}
+function closeModal(){ document.getElementById('modalOverlay')?.remove(); }
+
+/* ============ RENDER: STAFF DASHBOARD ============ */
+function renderStaffDash(){
+  const staff = staffCache[currentUser.id];
+  if(!staff){ renderLogin(); return; }
+  const tasks = myTasks(currentUser.id);
+  const now = Date.now();
+  const pending = tasks.filter(t=>t.status!=='completed');
+  const completed = tasks.filter(t=>t.status==='completed');
+  const nt = nextTrophy(staff);
+  const progressPct = nt ? Math.min(100, ((staff.onTimeCount||0)/nt.threshold)*100) : 100;
+
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="topbar">
+      <div class="brand"><span class="dot"></span>TodoQuest</div>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>
+    </div>
+    <div class="dash-header">
+      <div class="row1">
+        <div>
+          <h2>${staff.name}</h2>
+          <span class="role-tag">Player</span>
+          ${renderCharms(staff)}
+        </div>
+        <div class="coin-pill" id="coinPill">${coinSVG}<span>${staff.coins||0}</span></div>
+      </div>
+      <div class="trophy-shelf">
+        ${TROPHIES.map(t=>{
+          const unlocked = (staff.onTimeCount||0) >= t.threshold;
+          return `<div class="trophy-slot ${unlocked?'unlocked':''}">${trophySVG(t.color, !unlocked)}<div class="tlabel">${t.label}</div></div>`;
+        }).join('')}
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" style="width:${progressPct}%"></div></div>
+        <div class="progress-label">${nt ? `${staff.onTimeCount||0}/${nt.threshold} on-time tasks → ${nt.label} Trophy` : `🏆 All trophies unlocked!`}</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab ${activeTab==='tasks'?'active':''}" onclick="setTab('tasks')">Quest Log</div>
+      <div class="tab ${activeTab==='add'?'active':''}" onclick="setTab('add')">+ New Quest</div>
+      <div class="tab ${activeTab==='shop'?'active':''}" onclick="setTab('shop')">Charm Shop</div>
+      <div class="tab ${activeTab==='board'?'active':''}" onclick="setTab('board')">Hall of Fame</div>
+    </div>
+
+    <div id="tabContent"></div>
+  `;
+
+  const content = document.getElementById('tabContent');
+  if(activeTab==='tasks'){
+    content.innerHTML = renderTaskLists(pending, completed, now);
+  } else if(activeTab==='add'){
+    content.innerHTML = renderAddTaskForm();
+  } else if(activeTab==='shop'){
+    content.innerHTML = renderCharmShop(staff);
+  } else {
+    content.innerHTML = renderLeaderboard();
+  }
+}
+
+function renderTaskLists(pending, completed, now){
+  const overdue = pending.filter(t=>t.deadline && t.deadline < now);
+  const upcoming = pending.filter(t=>!t.deadline || t.deadline >= now);
+
+  function taskRow(t){
+    const isOverdue = t.status!=='completed' && t.deadline && t.deadline < now;
+    const cardClass = t.status==='completed' ? 'completed' : (isOverdue ? 'overdue' : 'upcoming');
+    return `
+    <div class="task-card ${cardClass}">
+      <div>
+        <div class="task-title">${t.title}</div>
+        <div class="task-meta">
+          ${t.deadline ? `<span class="chip ${isOverdue?'chip-overdue':'chip-deadline'}">⏰ ${fmtDate(t.deadline)}</span>` : `<span class="chip chip-deadline">No deadline</span>`}
+          <span class="chip chip-source">${t.source==='admin' ? '👤 Admin assigned' : '✍️ Self-added'}</span>
+          ${t.status==='completed' ? (t.onTime ? `<span class="chip chip-reward">🏆 +${COINS_PER_TASK} coins</span>` : `<span class="chip chip-late">Completed late — no reward</span>`) : ''}
+        </div>
+      </div>
+      ${t.status!=='completed' ? `<div class="task-actions"><button class="btn btn-success btn-sm" onclick="completeTask('${t.id}')">✓ Complete</button></div>` : ''}
+    </div>`;
+  }
+
+  return `
+    <div class="section-title">Active Quests (${pending.length})</div>
+    ${pending.length ? [...overdue, ...upcoming].map(taskRow).join('') : `<div class="empty-state"><div class="big">🎉</div>Quest log clear! Add a new quest to keep the streak alive.</div>`}
+    <div class="section-title">Cleared Quests (${completed.length})</div>
+    ${completed.length ? completed.sort((a,b)=>(b.completedAt||0)-(a.completedAt||0)).map(taskRow).join('') : `<div class="empty-state" style="padding:20px;">Innu vare onnum complete cheyithittilla</div>`}
+  `;
+}
+
+function renderAddTaskForm(){
+  return `
+    <div class="card">
+      <label style="margin-top:0;">Quest Titles</label>
+      <textarea id="newTaskTitle" rows="5" placeholder="One quest per line&#10;Ex: Client report submit cheyyuka&#10;Ex: Social media post design cheyyuka"></textarea>
+      <label>Deadline</label>
+      <input id="newTaskDeadline" type="datetime-local" value="${todayDateTimeInput()}">
+      <button class="btn btn-primary btn-block" style="margin-top:18px;" onclick="addSelfTask()">+ Start Quests</button>
+    </div>
+  `;
+}
+function addSelfTask(){
+  const titles = parseQuestTitles(document.getElementById('newTaskTitle').value);
+  const deadlineVal = document.getElementById('newTaskDeadline').value;
+  if(!titles.length){ toast('At least one quest title venam'); return; }
+  const deadline = deadlineVal ? new Date(deadlineVal).getTime() : null;
+  Promise.all(titles.map(title => db.ref('todoQuest/tasks').push().set({
+    staffId: currentUser.id,
+    title,
+    desc: '',
+    deadline,
+    source: 'self',
+    status: 'pending',
+    createdAt: Date.now()
+  }))).then(()=>{
+    toast(`✅ ${titles.length} Quest${titles.length>1?'s':''} Added`);
+    activeTab='tasks';
+  });
+}
+
+function renderCharmShop(staff){
+  const owned = ownedCharmKeys(staff);
+  return `
+    <div class="section-title">Charm Shop</div>
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
+        <div>
+          <h3>Buy charms with your coins</h3>
+          <div style="color:var(--muted);font-size:13px;margin-top:4px;">Purchased charms are visible to all players.</div>
+        </div>
+        <div class="coin-pill">${coinSVG}<span>${staff.coins||0}</span></div>
+      </div>
+    </div>
+    <div class="shop-grid">
+      ${CHARM_SHOP.map(charm=>{
+        const hasCharm = owned.includes(charm.key);
+        const canBuy = (staff.coins||0) >= charm.cost && !hasCharm;
+        return `
+          <div class="shop-card">
+            <div class="shop-icon">${charm.icon}</div>
+            <div class="shop-name">${charm.name}</div>
+            <div class="shop-cost">🪙 ${charm.cost} coins</div>
+            ${hasCharm
+              ? `<div class="shop-owned">Owned</div>`
+              : `<button class="btn btn-primary btn-sm" ${canBuy?'':'disabled'} onclick="buyCharm('${charm.key}')">${canBuy?'Buy Charm':'Need Coins'}</button>`}
+          </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function buyCharm(charmKey){
+  const charm = CHARM_SHOP.find(c=>c.key===charmKey);
+  if(!charm || !currentUser || currentUser.isAdmin) return;
+  const staffRef = db.ref('todoQuest/staff/'+currentUser.id);
+  staffRef.transaction(staff=>{
+    if(!staff) return;
+    staff.charms = staff.charms || {};
+    if(staff.charms[charm.key]) return;
+    if((staff.coins||0) < charm.cost) return;
+    staff.coins = (staff.coins||0) - charm.cost;
+    staff.charms[charm.key] = true;
+    return staff;
+  }).then(result=>{
+    if(result.committed){
+      toast(`${charm.icon} ${charm.name} purchased!`);
+      activeTab='shop';
+    } else {
+      toast('Coins mathi alla or already owned');
+    }
+  });
+}
+
+function renderLeaderboard(){
+  const ranked = Object.entries(staffCache)
+    .map(([id,s])=>({id,...s}))
+    .sort((a,b)=>(b.coins||0)-(a.coins||0));
+  return `
+    <div class="card">
+      <div class="table-scroll">
+      <table>
+        <tr><th>#</th><th>Player</th><th>Coins</th><th>Charms</th><th>Trophies</th></tr>
+        ${ranked.map((s,i)=>`
+          <tr>
+            <td class="lb-rank">${i+1}</td>
+            <td>${s.name}</td>
+            <td>🪙 ${s.coins||0}</td>
+            <td>${renderCharms(s,true)}</td>
+            <td>${TROPHIES.map(t=>(s.onTimeCount||0)>=t.threshold ? trophySVG(t.color,false) : '').join('')}</td>
+          </tr>`).join('')}
+      </table>
+      </div>
+    </div>
+  `;
+}
+
+function completeTask(taskId){
+  const t = taskCache[taskId];
+  const now = Date.now();
+  const onTime = t.deadline ? now <= t.deadline : true;
+  const updates = {
+    status: 'completed',
+    completedAt: now,
+    onTime
+  };
+  db.ref('todoQuest/tasks/'+taskId).update(updates).then(()=>{
+    if(onTime){
+      const staffRef = db.ref('todoQuest/staff/'+t.staffId);
+      staffRef.transaction(s=>{
+        if(!s) return s;
+        s.coins = (s.coins||0) + COINS_PER_TASK;
+        s.onTimeCount = (s.onTimeCount||0) + 1;
+        return s;
+      }).then(()=>{
+        toast(`🎉 +${COINS_PER_TASK} coins! Onnu kaanam →`);
+        setTimeout(()=>document.getElementById('coinPill')?.classList.add('bump'), 100);
+      });
+    } else {
+      toast('Task complete cheythu, pakshe deadline kazhinjirunnu — reward illa');
+    }
+  });
+}
+
+function setTab(tab){ activeTab = tab; renderStaffDash(); }
+function logout(){ currentUser=null; activeTab='tasks'; renderLogin(); }
+
+/* ============ RENDER: ADMIN DASHBOARD ============ */
+let adminTab = 'overview';
+function renderAdmin(){
+  const staffList = Object.entries(staffCache).map(([id,s])=>({id,...s}));
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="topbar">
+      <div class="brand"><span class="dot"></span>Quest Master</div>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>
+    </div>
+    <div class="tabs">
+      <div class="tab ${adminTab==='overview'?'active':''}" onclick="setAdminTab('overview')">Command Board</div>
+      <div class="tab ${adminTab==='assign'?'active':''}" onclick="setAdminTab('assign')">Assign Quest</div>
+      <div class="tab ${adminTab==='staff'?'active':''}" onclick="setAdminTab('staff')">Players</div>
+    </div>
+    <div id="adminContent"></div>
+  `;
+  const content = document.getElementById('adminContent');
+  if(adminTab==='overview') content.innerHTML = renderAdminOverview(staffList);
+  else if(adminTab==='assign') content.innerHTML = renderAssignForm(staffList);
+  else content.innerHTML = renderManageStaff(staffList);
+}
+function setAdminTab(t){ adminTab=t; renderAdmin(); }
+
+function renderAdminOverview(staffList){
+  const now = Date.now();
+  return `
+    <div class="card">
+      <div class="table-scroll">
+      <table>
+        <tr><th>Player</th><th>Active</th><th>Overdue</th><th>Cleared</th><th>Coins</th><th>Charms</th><th>Trophies</th></tr>
+        ${staffList.map(s=>{
+          const tasks = myTasks(s.id);
+          const pending = tasks.filter(t=>t.status!=='completed');
+          const overdue = pending.filter(t=>t.deadline && t.deadline<now);
+          const completed = tasks.filter(t=>t.status==='completed');
+          return `<tr>
+            <td>${s.name}</td>
+            <td>${pending.length}</td>
+            <td style="color:${overdue.length?'var(--danger)':'inherit'}">${overdue.length}</td>
+            <td>${completed.length}</td>
+            <td>🪙 ${s.coins||0}</td>
+            <td>${renderCharms(s,true)}</td>
+            <td>${trophyCountFor(s)}</td>
+          </tr>`;
+        }).join('')}
+      </table>
+      </div>
+      ${staffList.length===0 ? `<div class="empty-state">No players yet. Add them from the Players tab.</div>` : ''}
+    </div>
+  `;
+}
+
+function renderAssignForm(staffList){
+  return `
+    <div class="card">
+      <label style="margin-top:0;">Player</label>
+      <select id="assignStaffId">
+        ${staffList.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}
+      </select>
+      <label>Quest Titles</label>
+      <textarea id="assignTitle" rows="5" placeholder="One quest per line&#10;Ex: Client report submit cheyyuka&#10;Ex: Poster design cheyyuka&#10;Ex: Follow-up call cheyyuka"></textarea>
+      <label>Deadline</label>
+      <input id="assignDeadline" type="datetime-local" value="${todayDateTimeInput()}">
+      <button class="btn btn-primary btn-block" style="margin-top:18px;" onclick="assignTask()">Assign Quests</button>
+    </div>
+  `;
+}
+function assignTask(){
+  const staffId = document.getElementById('assignStaffId').value;
+  const titles = parseQuestTitles(document.getElementById('assignTitle').value);
+  const deadlineVal = document.getElementById('assignDeadline').value;
+  if(!staffId || !titles.length || !deadlineVal){ toast('Player, quest title, deadline ellam venam'); return; }
+  const deadline = new Date(deadlineVal).getTime();
+  Promise.all(titles.map(title => db.ref('todoQuest/tasks').push().set({
+    staffId, title, desc: '', deadline,
+    source:'admin', status:'pending', createdAt: Date.now()
+  }))).then(()=>{
+    toast(`✅ ${titles.length} Quest${titles.length>1?'s':''} assigned`);
+    document.getElementById('assignTitle').value='';
+    document.getElementById('assignDeadline').value=todayDateTimeInput();
+  });
+}
+
+function renderManageStaff(staffList){
+  return `
+    <div class="card" style="margin-bottom:16px;">
+      <label style="margin-top:0;">Player Name</label>
+      <input id="newStaffName" placeholder="Ex: Fathima">
+      <div class="grid2">
+        <div><label>4-digit PIN</label><input id="newStaffPin" maxlength="4" placeholder="1234"></div>
+      </div>
+      <button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="addStaff()">+ Add Player</button>
+    </div>
+    <div class="card">
+      <div class="table-scroll">
+      <table>
+        <tr><th>Name</th><th>PIN</th><th>Coins</th><th>Charms</th><th></th></tr>
+        ${staffList.map(s=>`
+          <tr>
+            <td>${s.name}</td><td>${s.pin||'0000'}</td><td>🪙 ${s.coins||0}</td><td>${renderCharms(s,true)}</td>
+            <td><a style="color:var(--danger);font-size:12.5px;cursor:pointer;" onclick="removeStaff('${s.id}')">Remove</a></td>
+          </tr>`).join('')}
+      </table>
+      </div>
+    </div>
+  `;
+}
+function addStaff(){
+  const name = document.getElementById('newStaffName').value.trim();
+  let pin = document.getElementById('newStaffPin').value.trim();
+  if(!name){ toast('Peru venam'); return; }
+  if(!pin || pin.length!==4) pin='0000';
+  db.ref('todoQuest/staff').push().set({name, pin, coins:0, onTimeCount:0, charms:{}, createdAt:Date.now()}).then(()=>{
+    toast('✅ Staff added');
+    document.getElementById('newStaffName').value='';
+    document.getElementById('newStaffPin').value='';
+  });
+}
+function removeStaff(id){
+  if(confirm('Ee staff-ne remove cheyyano? (Task history angane thanne irikkum)')){
+    db.ref('todoQuest/staff/'+id).remove();
+  }
+}
+
+/* ============ BOOT ============ */
+(function boot(){
+  const saved = localStorage.getItem('bb_todoquest_config');
+  if(saved){
+    try{ initFirebase(JSON.parse(saved)); }
+    catch(e){ renderSetup(); }
+  } else {
+    renderSetup();
+  }
+})();
+</script>
+</body>
+</html>
