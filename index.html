@@ -290,6 +290,15 @@ let currentUser = null; // {id, name, isAdmin}
 let staffCache = {};
 let taskCache = {};
 let activeTab = 'tasks';
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBwVg-0Sv1OUWEv4fXObpB7dswFFS_E6qE",
+  authDomain: "todo-8a68a.firebaseapp.com",
+  databaseURL: "https://todo-8a68a-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "todo-8a68a",
+  storageBucket: "todo-8a68a.firebasestorage.app",
+  messagingSenderId: "154456880819",
+  appId: "1:154456880819:web:6f3a3edb82ba845f4822c6"
+};
 
 /* ============ FIREBASE SETUP ============ */
 function initFirebase(config){
@@ -829,9 +838,9 @@ function removeStaff(id){
   const saved = localStorage.getItem('bb_todoquest_config');
   if(saved){
     try{ initFirebase(JSON.parse(saved)); }
-    catch(e){ renderSetup(); }
+    catch(e){ initFirebase(DEFAULT_FIREBASE_CONFIG); }
   } else {
-    renderSetup();
+    initFirebase(DEFAULT_FIREBASE_CONFIG);
   }
 })();
 </script>
