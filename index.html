@@ -209,9 +209,15 @@
   .shop-name{font-family:'Sora',sans-serif;font-weight:800;font-size:15px;}
   .shop-cost{color:var(--gold);font-weight:800;font-size:12px;margin:7px 0 12px;text-transform:uppercase;}
   .shop-owned{color:var(--success);font-weight:800;font-size:12px;text-transform:uppercase;}
+  body[data-theme="neon"]{--primary:#22d3ee;--primary-dark:#2563eb;--gold:#facc15;--surface:#172554;--surface-2:#312e81;--border:#67e8f9;}
+  body[data-theme="candy"]{--primary:#f472b6;--primary-dark:#db2777;--gold:#fde047;--surface:#3b1746;--surface-2:#5b214f;--border:#f9a8d4;}
+  body[data-theme="forest"]{--primary:#34d399;--primary-dark:#059669;--gold:#bef264;--surface:#163326;--surface-2:#214834;--border:#86efac;}
+  body[data-theme="sunset"]{--primary:#fb923c;--primary-dark:#ea580c;--gold:#fde047;--surface:#3b1d2e;--surface-2:#5f2442;--border:#fdba74;}
+  body[data-theme="royal"]{--primary:#a78bfa;--primary-dark:#7c3aed;--gold:#facc15;--surface:#231942;--surface-2:#372768;--border:#c4b5fd;}
+  body[data-theme="ocean"]{--primary:#38bdf8;--primary-dark:#0284c7;--gold:#67e8f9;--surface:#0f2b46;--surface-2:#164e63;--border:#7dd3fc;}
 
   .table-scroll{width:100%;overflow-x:auto;}
-  table{width:100%;min-width:680px;border-collapse:collapse;font-size:13.5px;}
+  table{width:100%;min-width:820px;border-collapse:collapse;font-size:13.5px;}
   th{text-align:left;color:var(--gold);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;padding:8px 10px;border-bottom:1.5px solid var(--border);}
   td{padding:10px;border-bottom:1px solid var(--border);}
   tr:last-child td{border-bottom:none;}
@@ -280,7 +286,21 @@ const CHARM_SHOP = [
   {key:'crown', name:'Royal Crown', icon:'👑', cost:50},
   {key:'rocket', name:'Rocket Boost', icon:'🚀', cost:70},
   {key:'shield', name:'Power Shield', icon:'🛡️', cost:90},
-  {key:'diamond', name:'Diamond Charm', icon:'💎', cost:120}
+  {key:'diamond', name:'Diamond Charm', icon:'💎', cost:120},
+  {key:'lightning', name:'Lightning Bolt', icon:'⚡', cost:140},
+  {key:'crystal', name:'Crystal Orb', icon:'🔮', cost:160},
+  {key:'ninja', name:'Ninja Mask', icon:'🥷', cost:180},
+  {key:'dragon', name:'Dragon Badge', icon:'🐉', cost:220},
+  {key:'galaxy', name:'Galaxy Core', icon:'🌌', cost:260},
+  {key:'phoenix', name:'Phoenix Feather', icon:'🪶', cost:300}
+];
+const THEME_SHOP = [
+  {key:'neon', name:'Neon Arena', icon:'🟦', cost:40},
+  {key:'candy', name:'Candy Pop', icon:'🍭', cost:60},
+  {key:'forest', name:'Forest Quest', icon:'🌿', cost:80},
+  {key:'sunset', name:'Sunset Blaze', icon:'🌅', cost:100},
+  {key:'royal', name:'Royal Magic', icon:'💜', cost:130},
+  {key:'ocean', name:'Ocean Wave', icon:'🌊', cost:150}
 ];
 const COINS_PER_TASK = 10;
 
@@ -342,18 +362,36 @@ function fmtDate(ts){
   const d = new Date(ts);
   return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) + ', ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
 }
-function todayDateTimeInput(){
-  const d = new Date();
+function todayDateTimeInput(ts=Date.now()){
+  const d = new Date(ts || Date.now());
   const pad = n => String(n).padStart(2,'0');
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 function parseQuestTitles(raw){
   return raw.split('\n').map(t => t.trim()).filter(Boolean);
 }
+function escapeAttr(value){
+  return String(value ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 function ownedCharmKeys(staff){
   const charms = staff?.charms || {};
   if(Array.isArray(charms)) return charms;
   return Object.keys(charms).filter(k => charms[k]);
+}
+function ownedThemeKeys(staff){
+  const themes = staff?.themes || {};
+  if(Array.isArray(themes)) return themes;
+  return Object.keys(themes).filter(k => themes[k]);
+}
+function activeTheme(staff){
+  return THEME_SHOP.find(t => t.key === staff?.activeTheme);
+}
+function renderThemeName(staff){
+  const theme = activeTheme(staff);
+  return theme ? `${theme.icon} ${theme.name}` : 'Default';
+}
+function applyActiveTheme(staff){
+  document.body.dataset.theme = activeTheme(staff)?.key || 'default';
 }
 function renderCharms(staff, compact=false){
   const owned = ownedCharmKeys(staff);
@@ -407,6 +445,7 @@ function submitConfig(){
 /* ============ RENDER: LOGIN ============ */
 function renderLogin(){
   currentUser = null;
+  document.body.dataset.theme = 'default';
   const app = document.getElementById('app');
   const staffList = Object.entries(staffCache);
   app.innerHTML = `
@@ -421,6 +460,7 @@ function renderLogin(){
           <div class="avatar" style="background:${avatarColor(s.name)}">${initials(s.name)}</div>
           <div class="name">${s.name}</div>
           <div class="coins">🪙 ${s.coins||0}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">${renderThemeName(s)}</div>
           ${renderCharms(s)}
         </div>`).join('')}
     </div>
@@ -487,6 +527,7 @@ function closeModal(){ document.getElementById('modalOverlay')?.remove(); }
 function renderStaffDash(){
   const staff = staffCache[currentUser.id];
   if(!staff){ renderLogin(); return; }
+  applyActiveTheme(staff);
   const tasks = myTasks(currentUser.id);
   const now = Date.now();
   const pending = tasks.filter(t=>t.status!=='completed');
@@ -560,7 +601,10 @@ function renderTaskLists(pending, completed, now){
           ${t.status==='completed' ? (t.onTime ? `<span class="chip chip-reward">🏆 +${COINS_PER_TASK} coins</span>` : `<span class="chip chip-late">Completed late — no reward</span>`) : ''}
         </div>
       </div>
-      ${t.status!=='completed' ? `<div class="task-actions"><button class="btn btn-success btn-sm" onclick="completeTask('${t.id}')">✓ Complete</button></div>` : ''}
+      ${t.status!=='completed' ? `<div class="task-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editTask('${t.id}')">Edit</button>
+        <button class="btn btn-success btn-sm" onclick="completeTask('${t.id}')">✓ Complete</button>
+      </div>` : ''}
     </div>`;
   }
 
@@ -604,17 +648,19 @@ function addSelfTask(){
 
 function renderCharmShop(staff){
   const owned = ownedCharmKeys(staff);
+  const ownedThemes = ownedThemeKeys(staff);
   return `
     <div class="section-title">Charm Shop</div>
     <div class="card" style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
         <div>
-          <h3>Buy charms with your coins</h3>
-          <div style="color:var(--muted);font-size:13px;margin-top:4px;">Purchased charms are visible to all players.</div>
+          <h3>Buy charms and themes with your coins</h3>
+          <div style="color:var(--muted);font-size:13px;margin-top:4px;">Charms are visible to all players. Themes change your game screen.</div>
         </div>
         <div class="coin-pill">${coinSVG}<span>${staff.coins||0}</span></div>
       </div>
     </div>
+    <div class="section-title">Charms</div>
     <div class="shop-grid">
       ${CHARM_SHOP.map(charm=>{
         const hasCharm = owned.includes(charm.key);
@@ -627,6 +673,25 @@ function renderCharmShop(staff){
             ${hasCharm
               ? `<div class="shop-owned">Owned</div>`
               : `<button class="btn btn-primary btn-sm" ${canBuy?'':'disabled'} onclick="buyCharm('${charm.key}')">${canBuy?'Buy Charm':'Need Coins'}</button>`}
+          </div>`;
+      }).join('')}
+    </div>
+    <div class="section-title">Themes</div>
+    <div class="shop-grid">
+      ${THEME_SHOP.map(theme=>{
+        const hasTheme = ownedThemes.includes(theme.key);
+        const isActive = staff.activeTheme === theme.key;
+        const canBuy = (staff.coins||0) >= theme.cost && !hasTheme;
+        return `
+          <div class="shop-card">
+            <div class="shop-icon">${theme.icon}</div>
+            <div class="shop-name">${theme.name}</div>
+            <div class="shop-cost">🪙 ${theme.cost} coins</div>
+            ${isActive
+              ? `<div class="shop-owned">Applied</div>`
+              : hasTheme
+                ? `<button class="btn btn-primary btn-sm" onclick="selectTheme('${theme.key}')">Apply Theme</button>`
+                : `<button class="btn btn-primary btn-sm" ${canBuy?'':'disabled'} onclick="buyTheme('${theme.key}')">${canBuy?'Buy Theme':'Need Coins'}</button>`}
           </div>`;
       }).join('')}
     </div>
@@ -655,6 +720,39 @@ function buyCharm(charmKey){
   });
 }
 
+function buyTheme(themeKey){
+  const theme = THEME_SHOP.find(t=>t.key===themeKey);
+  if(!theme || !currentUser || currentUser.isAdmin) return;
+  const staffRef = db.ref('todoQuest/staff/'+currentUser.id);
+  staffRef.transaction(staff=>{
+    if(!staff) return;
+    staff.themes = staff.themes || {};
+    if(staff.themes[theme.key]) return;
+    if((staff.coins||0) < theme.cost) return;
+    staff.coins = (staff.coins||0) - theme.cost;
+    staff.themes[theme.key] = true;
+    staff.activeTheme = theme.key;
+    return staff;
+  }).then(result=>{
+    if(result.committed){
+      toast(`${theme.icon} ${theme.name} purchased and applied!`);
+      activeTab='shop';
+    } else {
+      toast('Coins mathi alla or already owned');
+    }
+  });
+}
+
+function selectTheme(themeKey){
+  const theme = THEME_SHOP.find(t=>t.key===themeKey);
+  const staff = staffCache[currentUser?.id];
+  if(!theme || !staff || !ownedThemeKeys(staff).includes(themeKey)) return;
+  db.ref('todoQuest/staff/'+currentUser.id).update({activeTheme: themeKey}).then(()=>{
+    toast(`${theme.icon} ${theme.name} applied`);
+    activeTab='shop';
+  });
+}
+
 function renderLeaderboard(){
   const ranked = Object.entries(staffCache)
     .map(([id,s])=>({id,...s}))
@@ -663,12 +761,13 @@ function renderLeaderboard(){
     <div class="card">
       <div class="table-scroll">
       <table>
-        <tr><th>#</th><th>Player</th><th>Coins</th><th>Charms</th><th>Trophies</th></tr>
+        <tr><th>#</th><th>Player</th><th>Coins</th><th>Theme</th><th>Charms</th><th>Trophies</th></tr>
         ${ranked.map((s,i)=>`
           <tr>
             <td class="lb-rank">${i+1}</td>
             <td>${s.name}</td>
             <td>🪙 ${s.coins||0}</td>
+            <td>${renderThemeName(s)}</td>
             <td>${renderCharms(s,true)}</td>
             <td>${TROPHIES.map(t=>(s.onTimeCount||0)>=t.threshold ? trophySVG(t.color,false) : '').join('')}</td>
           </tr>`).join('')}
@@ -676,6 +775,34 @@ function renderLeaderboard(){
       </div>
     </div>
   `;
+}
+
+function editTask(taskId){
+  const t = taskCache[taskId];
+  if(!t || !currentUser || currentUser.isAdmin || t.staffId !== currentUser.id || t.status === 'completed') return;
+  showModal(`
+    <h3 style="margin-bottom:12px;">Edit Quest</h3>
+    <label style="margin-top:0;">Quest Title</label>
+    <input id="editTaskTitle" value="${escapeAttr(t.title)}" placeholder="Quest title">
+    <label>Deadline</label>
+    <input id="editTaskDeadline" type="datetime-local" value="${todayDateTimeInput(t.deadline || Date.now())}">
+    <button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="saveTaskEdit('${taskId}')">Save Quest</button>
+  `);
+}
+function saveTaskEdit(taskId){
+  const t = taskCache[taskId];
+  if(!t || !currentUser || currentUser.isAdmin || t.staffId !== currentUser.id || t.status === 'completed') return;
+  const title = document.getElementById('editTaskTitle').value.trim();
+  const deadlineVal = document.getElementById('editTaskDeadline').value;
+  if(!title){ toast('Quest title venam'); return; }
+  db.ref('todoQuest/tasks/'+taskId).update({
+    title,
+    deadline: deadlineVal ? new Date(deadlineVal).getTime() : null,
+    editedAt: Date.now()
+  }).then(()=>{
+    closeModal();
+    toast('✅ Quest updated');
+  });
 }
 
 function completeTask(taskId){
@@ -711,6 +838,7 @@ function logout(){ currentUser=null; activeTab='tasks'; renderLogin(); }
 /* ============ RENDER: ADMIN DASHBOARD ============ */
 let adminTab = 'overview';
 function renderAdmin(){
+  document.body.dataset.theme = 'default';
   const staffList = Object.entries(staffCache).map(([id,s])=>({id,...s}));
   const app = document.getElementById('app');
   app.innerHTML = `
@@ -738,7 +866,7 @@ function renderAdminOverview(staffList){
     <div class="card">
       <div class="table-scroll">
       <table>
-        <tr><th>Player</th><th>Active</th><th>Overdue</th><th>Cleared</th><th>Coins</th><th>Charms</th><th>Trophies</th></tr>
+        <tr><th>Player</th><th>Active</th><th>Overdue</th><th>Cleared</th><th>Coins</th><th>Theme</th><th>Charms</th><th>Trophies</th></tr>
         ${staffList.map(s=>{
           const tasks = myTasks(s.id);
           const pending = tasks.filter(t=>t.status!=='completed');
@@ -750,6 +878,7 @@ function renderAdminOverview(staffList){
             <td style="color:${overdue.length?'var(--danger)':'inherit'}">${overdue.length}</td>
             <td>${completed.length}</td>
             <td>🪙 ${s.coins||0}</td>
+            <td>${renderThemeName(s)}</td>
             <td>${renderCharms(s,true)}</td>
             <td>${trophyCountFor(s)}</td>
           </tr>`;
@@ -805,10 +934,10 @@ function renderManageStaff(staffList){
     <div class="card">
       <div class="table-scroll">
       <table>
-        <tr><th>Name</th><th>PIN</th><th>Coins</th><th>Charms</th><th></th></tr>
+        <tr><th>Name</th><th>PIN</th><th>Coins</th><th>Theme</th><th>Charms</th><th></th></tr>
         ${staffList.map(s=>`
           <tr>
-            <td>${s.name}</td><td>${s.pin||'0000'}</td><td>🪙 ${s.coins||0}</td><td>${renderCharms(s,true)}</td>
+            <td>${s.name}</td><td>${s.pin||'0000'}</td><td>🪙 ${s.coins||0}</td><td>${renderThemeName(s)}</td><td>${renderCharms(s,true)}</td>
             <td><a style="color:var(--danger);font-size:12.5px;cursor:pointer;" onclick="removeStaff('${s.id}')">Remove</a></td>
           </tr>`).join('')}
       </table>
@@ -821,7 +950,7 @@ function addStaff(){
   let pin = document.getElementById('newStaffPin').value.trim();
   if(!name){ toast('Peru venam'); return; }
   if(!pin || pin.length!==4) pin='0000';
-  db.ref('todoQuest/staff').push().set({name, pin, coins:0, onTimeCount:0, charms:{}, createdAt:Date.now()}).then(()=>{
+  db.ref('todoQuest/staff').push().set({name, pin, coins:0, onTimeCount:0, charms:{}, themes:{}, activeTheme:'', createdAt:Date.now()}).then(()=>{
     toast('✅ Staff added');
     document.getElementById('newStaffName').value='';
     document.getElementById('newStaffPin').value='';
