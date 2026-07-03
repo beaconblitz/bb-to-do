@@ -190,13 +190,51 @@
   .task-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
   .empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
   .empty-state .big{font-size:32px;margin-bottom:8px;}
-  .charm-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px;}
+  .charm-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;margin-top:8px;min-height:76px;}
+  .charm-row.compact{gap:5px;min-height:42px;margin-top:0;}
   .charm-badge{
-    min-width:28px;height:28px;padding:3px 7px;border-radius:8px;
-    display:inline-flex;align-items:center;justify-content:center;gap:4px;
-    background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.04));
-    border:1px solid rgba(255,255,255,.18);box-shadow:0 0 14px rgba(255,255,255,.08);
-    font-size:16px;font-weight:800;
+    width:42px;height:72px;padding-top:34px;position:relative;
+    display:inline-flex;align-items:flex-start;justify-content:center;
+    transform-origin:50% 2px;
+    animation:charmSwing 3.8s ease-in-out infinite;
+    animation-delay:calc(var(--i, 0) * -.42s);
+    filter:drop-shadow(0 10px 10px rgba(0,0,0,.24));
+  }
+  .charm-row.compact .charm-badge{width:26px;height:40px;padding-top:18px;animation-duration:4.6s;}
+  .charm-badge::before{
+    content:"";position:absolute;left:50%;top:2px;width:2px;height:38px;border-radius:999px;
+    background:linear-gradient(180deg,var(--gold),var(--pink),var(--primary));
+    transform:translateX(-50%) rotate(calc((var(--i, 0) - 2) * 3deg));
+    box-shadow:0 0 10px rgba(255,255,255,.18);
+  }
+  .charm-row.compact .charm-badge::before{height:22px;width:1px;}
+  .charm-badge::after{
+    content:"";position:absolute;left:50%;top:3px;width:8px;height:8px;border-radius:50%;
+    background:radial-gradient(circle at 32% 30%,#fff,var(--primary) 35%,var(--violet) 72%);
+    border:1px solid rgba(255,255,255,.38);
+    transform:translateX(-50%);
+    box-shadow:0 0 12px var(--primary);
+  }
+  .charm-row.compact .charm-badge::after{width:5px;height:5px;}
+  .charm-gem{
+    width:34px;height:34px;border-radius:10px;
+    display:inline-flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(circle at 32% 24%,rgba(255,255,255,.86),rgba(255,255,255,.12) 18%,transparent 35%),
+      linear-gradient(150deg,rgba(255,255,255,.22),rgba(255,255,255,.05)),
+      linear-gradient(135deg,var(--surface-2),var(--primary-light));
+    border:1px solid rgba(255,255,255,.32);
+    box-shadow:inset 0 -7px 12px rgba(0,0,0,.22),0 0 18px color-mix(in srgb,var(--primary) 60%,transparent);
+    font-size:18px;font-weight:800;
+  }
+  .charm-row.compact .charm-gem{width:22px;height:22px;border-radius:7px;font-size:12px;}
+  .charm-badge:nth-child(2n) .charm-gem{border-radius:50% 50% 12px 12px;}
+  .charm-badge:nth-child(3n) .charm-gem{border-radius:12px 12px 50% 50%;}
+  .charm-badge:nth-child(4n) .charm-gem{transform:rotate(45deg);}
+  .charm-badge:nth-child(4n) .charm-gem span{transform:rotate(-45deg);}
+  @keyframes charmSwing{
+    0%,100%{transform:rotate(-5deg) translateY(0);}
+    50%{transform:rotate(6deg) translateY(2px);}
   }
   .charm-badge.locked{opacity:.34;filter:grayscale(1);}
   .shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;}
@@ -264,6 +302,26 @@
     --shop-bg:linear-gradient(145deg,rgba(253,224,71,.22),rgba(244,114,182,.2),rgba(255,255,255,.08));
     --field-bg:#4a1542;--button-bg:linear-gradient(90deg,#f9a8d4,#fde047,#c084fc);--active-tab-bg:linear-gradient(180deg,#f9a8d4,#db2777);
   }
+  body[data-theme="moon"]{
+    --bg:#080b18;--surface:#151a2f;--surface-2:#202944;--primary:#c7d2fe;--primary-dark:#64748b;--primary-light:#20263b;--gold:#fef3c7;--gold-light:#3d3520;--success:#93c5fd;--success-light:#172d48;--danger:#fda4af;--danger-light:#441a25;--text:#f8fbff;--muted:#dbeafe;--border:#94a3b8;--xp:#e0e7ff;--pink:#f0abfc;--violet:#818cf8;--orange:#fbbf24;
+    --page-bg:radial-gradient(circle at 78% 12%,rgba(254,243,199,.8) 0 3%,rgba(254,243,199,.2) 4%,transparent 16%),radial-gradient(circle at 18% 24%,rgba(199,210,254,.18),transparent 28%),radial-gradient(circle at 70% 82%,rgba(147,197,253,.16),transparent 32%),linear-gradient(135deg,#020617 0%,#111827 42%,#1e293b 78%,#0f172a 100%);
+    --page-bg-size:160% 160%,160% 160%,160% 160%,300% 300%;
+    --card-bg:linear-gradient(180deg,rgba(32,41,68,.96),rgba(14,20,38,.98));
+    --dash-bg:linear-gradient(120deg,rgba(199,210,254,.28),rgba(254,243,199,.16),rgba(147,197,253,.18)),linear-gradient(180deg,#27324f,#111827);
+    --task-bg:linear-gradient(145deg,rgba(199,210,254,.16),rgba(147,197,253,.12),rgba(14,20,38,.96));
+    --shop-bg:linear-gradient(145deg,rgba(254,243,199,.16),rgba(199,210,254,.16),rgba(255,255,255,.06));
+    --field-bg:#0b1020;--button-bg:linear-gradient(90deg,#e0e7ff,#93c5fd,#fef3c7);--active-tab-bg:linear-gradient(180deg,#e0e7ff,#64748b);
+  }
+  body[data-theme="galaxy"]{
+    --bg:#080014;--surface:#1c1238;--surface-2:#331a66;--primary:#a855f7;--primary-dark:#6d28d9;--primary-light:#271044;--gold:#f0abfc;--gold-light:#3d183e;--success:#22d3ee;--success-light:#0b3540;--danger:#fb7185;--danger-light:#461526;--text:#fff7ff;--muted:#ddd6fe;--border:#c084fc;--xp:#67e8f9;--pink:#ec4899;--violet:#8b5cf6;--orange:#f97316;
+    --page-bg:radial-gradient(circle at 18% 18%,rgba(236,72,153,.32),transparent 28%),radial-gradient(circle at 78% 20%,rgba(34,211,238,.24),transparent 30%),radial-gradient(circle at 42% 80%,rgba(168,85,247,.34),transparent 34%),linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(135deg,#050014 0%,#2e1065 38%,#581c87 68%,#020617 100%);
+    --page-bg-size:160% 160%,160% 160%,160% 160%,52px 52px,300% 300%;
+    --card-bg:linear-gradient(180deg,rgba(51,26,102,.96),rgba(17,8,42,.98));
+    --dash-bg:linear-gradient(120deg,rgba(168,85,247,.38),rgba(236,72,153,.24),rgba(34,211,238,.18)),linear-gradient(180deg,#3b1b78,#100726);
+    --task-bg:linear-gradient(145deg,rgba(168,85,247,.2),rgba(236,72,153,.14),rgba(17,8,42,.96));
+    --shop-bg:linear-gradient(145deg,rgba(34,211,238,.16),rgba(168,85,247,.22),rgba(236,72,153,.14));
+    --field-bg:#10051f;--button-bg:linear-gradient(90deg,#22d3ee,#a855f7,#ec4899);--active-tab-bg:linear-gradient(180deg,#c084fc,#6d28d9);
+  }
   body[data-theme="forest"]{
     --bg:#07140f;--surface:#163326;--surface-2:#214834;--primary:#34d399;--primary-dark:#059669;--primary-light:#0d3b2b;--gold:#bef264;--gold-light:#2b3e16;--success:#86efac;--success-light:#123c28;--danger:#fb7185;--danger-light:#411520;--text:#f0fff7;--muted:#c7f9df;--border:#86efac;--xp:#a3e635;--pink:#f472b6;--violet:#818cf8;--orange:#f59e0b;
     --page-bg:linear-gradient(rgba(190,242,100,.05) 1px, transparent 1px),linear-gradient(90deg,rgba(52,211,153,.05) 1px,transparent 1px),radial-gradient(circle at 12% 16%,rgba(52,211,153,.28),transparent 28%),radial-gradient(circle at 80% 20%,rgba(190,242,100,.18),transparent 30%),linear-gradient(135deg,#052e1d 0%,#14532d 42%,#365314 72%,#1c1917 100%);
@@ -273,6 +331,16 @@
     --task-bg:linear-gradient(145deg,rgba(52,211,153,.18),rgba(190,242,100,.12),rgba(18,51,38,.96));
     --shop-bg:linear-gradient(145deg,rgba(190,242,100,.18),rgba(52,211,153,.16),rgba(245,158,11,.12));
     --field-bg:#0b2218;--button-bg:linear-gradient(90deg,#34d399,#bef264,#f59e0b);--active-tab-bg:linear-gradient(180deg,#86efac,#059669);
+  }
+  body[data-theme="rainbow"]{
+    --bg:#1a1024;--surface:#2b2040;--surface-2:#3b2b5e;--primary:#38bdf8;--primary-dark:#7c3aed;--primary-light:#252047;--gold:#fde047;--gold-light:#4a3710;--success:#4ade80;--success-light:#123822;--danger:#fb7185;--danger-light:#4b1728;--text:#fffaff;--muted:#f5d0fe;--border:#f0abfc;--xp:#bef264;--pink:#ec4899;--violet:#8b5cf6;--orange:#fb923c;
+    --page-bg:radial-gradient(circle at 10% 18%,rgba(239,68,68,.22),transparent 24%),radial-gradient(circle at 28% 16%,rgba(251,146,60,.22),transparent 25%),radial-gradient(circle at 48% 18%,rgba(253,224,71,.22),transparent 25%),radial-gradient(circle at 68% 16%,rgba(74,222,128,.2),transparent 25%),radial-gradient(circle at 86% 18%,rgba(56,189,248,.24),transparent 25%),linear-gradient(135deg,#581c87 0%,#be185d 28%,#f97316 50%,#16a34a 72%,#2563eb 100%);
+    --page-bg-size:160% 160%,160% 160%,160% 160%,160% 160%,160% 160%,300% 300%;
+    --card-bg:linear-gradient(180deg,rgba(59,43,94,.96),rgba(43,32,64,.98));
+    --dash-bg:linear-gradient(120deg,rgba(236,72,153,.28),rgba(253,224,71,.22),rgba(74,222,128,.2),rgba(56,189,248,.24),rgba(139,92,246,.24)),linear-gradient(180deg,#4c1d95,#2b2040);
+    --task-bg:linear-gradient(145deg,rgba(236,72,153,.16),rgba(253,224,71,.12),rgba(74,222,128,.12),rgba(56,189,248,.14),rgba(43,32,64,.96));
+    --shop-bg:linear-gradient(145deg,rgba(236,72,153,.18),rgba(253,224,71,.16),rgba(74,222,128,.14),rgba(56,189,248,.16));
+    --field-bg:#211530;--button-bg:linear-gradient(90deg,#ef4444,#f97316,#fde047,#4ade80,#38bdf8,#8b5cf6);--active-tab-bg:linear-gradient(90deg,#f97316,#fde047,#4ade80,#38bdf8,#8b5cf6);
   }
   body[data-theme="sunset"]{
     --bg:#23100b;--surface:#3b1d2e;--surface-2:#5f2442;--primary:#fb923c;--primary-dark:#ea580c;--primary-light:#512711;--gold:#fde047;--gold-light:#523b0e;--success:#4ade80;--success-light:#15351f;--danger:#ff6b6b;--danger-light:#4c1717;--text:#fff8ed;--muted:#ffd6b2;--border:#fdba74;--xp:#facc15;--pink:#fb7185;--violet:#a78bfa;--orange:#f97316;
@@ -386,7 +454,10 @@ const CHARM_SHOP = [
 const THEME_SHOP = [
   {key:'neon', name:'Neon Arena', icon:'🟦', cost:40},
   {key:'candy', name:'Candy Pop', icon:'🍭', cost:60},
-  {key:'forest', name:'Forest Quest', icon:'🌿', cost:80},
+  {key:'moon', name:'Moon Theme', icon:'🌙', cost:70},
+  {key:'galaxy', name:'Galaxy Theme', icon:'🌌', cost:80},
+  {key:'forest', name:'Forest Theme', icon:'🌿', cost:90},
+  {key:'rainbow', name:'Rainbow Theme', icon:'🌈', cost:110},
   {key:'sunset', name:'Sunset Blaze', icon:'🌅', cost:100},
   {key:'royal', name:'Royal Magic', icon:'💜', cost:130},
   {key:'ocean', name:'Ocean Wave', icon:'🌊', cost:150}
@@ -472,11 +543,16 @@ function ownedThemeKeys(staff){
   if(Array.isArray(themes)) return themes;
   return Object.keys(themes).filter(k => themes[k]);
 }
+function themesEnabled(staff){
+  return staff?.themeEnabled !== false;
+}
 function activeTheme(staff){
+  if(!themesEnabled(staff)) return null;
   return THEME_SHOP.find(t => t.key === staff?.activeTheme);
 }
 function renderThemeName(staff){
   const theme = activeTheme(staff);
+  if(!themesEnabled(staff)) return 'Theme Off';
   return theme ? `${theme.icon} ${theme.name}` : 'Default';
 }
 function applyActiveTheme(staff){
@@ -485,10 +561,10 @@ function applyActiveTheme(staff){
 function renderCharms(staff, compact=false){
   const owned = ownedCharmKeys(staff);
   if(!owned.length) return compact ? `<span style="color:var(--muted);font-size:12px;">No charms</span>` : `<div class="charm-row"><span style="color:var(--muted);font-size:12px;">No charms yet</span></div>`;
-  return `<div class="charm-row">${owned.map(key=>{
+  return `<div class="charm-row ${compact?'compact':''}">${owned.map((key,i)=>{
     const charm = CHARM_SHOP.find(c=>c.key===key);
     if(!charm) return '';
-    return `<span class="charm-badge" title="${charm.name}">${charm.icon}</span>`;
+    return `<span class="charm-badge" title="${charm.name}" style="--i:${i};"><span class="charm-gem"><span>${charm.icon}</span></span></span>`;
   }).join('')}</div>`;
 }
 function myTasks(staffId){
@@ -738,6 +814,7 @@ function addSelfTask(){
 function renderCharmShop(staff){
   const owned = ownedCharmKeys(staff);
   const ownedThemes = ownedThemeKeys(staff);
+  const themeIsOn = themesEnabled(staff);
   return `
     <div class="section-title">Charm Shop</div>
     <div class="card" style="margin-bottom:14px;">
@@ -766,10 +843,19 @@ function renderCharmShop(staff){
       }).join('')}
     </div>
     <div class="section-title">Themes</div>
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
+        <div>
+          <h3>Theme ${themeIsOn ? 'On' : 'Off'}</h3>
+          <div style="color:var(--muted);font-size:13px;margin-top:4px;">Switch themes off to use the default TodoQuest look. Purchased themes stay saved.</div>
+        </div>
+        <button class="btn ${themeIsOn ? 'btn-ghost' : 'btn-primary'} btn-sm" onclick="toggleThemeMode(${themeIsOn ? 'false' : 'true'})">${themeIsOn ? 'Turn Off' : 'Turn On'}</button>
+      </div>
+    </div>
     <div class="shop-grid">
       ${THEME_SHOP.map(theme=>{
         const hasTheme = ownedThemes.includes(theme.key);
-        const isActive = staff.activeTheme === theme.key;
+        const isActive = themeIsOn && staff.activeTheme === theme.key;
         const canBuy = (staff.coins||0) >= theme.cost && !hasTheme;
         return `
           <div class="shop-card">
@@ -821,6 +907,7 @@ function buyTheme(themeKey){
     staff.coins = (staff.coins||0) - theme.cost;
     staff.themes[theme.key] = true;
     staff.activeTheme = theme.key;
+    staff.themeEnabled = true;
     return staff;
   }).then(result=>{
     if(result.committed){
@@ -837,9 +924,20 @@ function selectTheme(themeKey){
   const theme = THEME_SHOP.find(t=>t.key===themeKey);
   const staff = staffCache[currentUser?.id];
   if(!theme || !staff || !ownedThemeKeys(staff).includes(themeKey)) return;
-  db.ref('todoQuest/staff/'+currentUser.id).update({activeTheme: themeKey}).then(()=>{
+  db.ref('todoQuest/staff/'+currentUser.id).update({activeTheme: themeKey, themeEnabled: true}).then(()=>{
     document.body.dataset.theme = theme.key;
     toast(`${theme.icon} ${theme.name} applied`);
+    activeTab='shop';
+  });
+}
+
+function toggleThemeMode(enabled){
+  if(!currentUser || currentUser.isAdmin) return;
+  const staff = staffCache[currentUser.id];
+  if(!staff) return;
+  db.ref('todoQuest/staff/'+currentUser.id).update({themeEnabled: enabled}).then(()=>{
+    document.body.dataset.theme = enabled ? (staff.activeTheme || 'default') : 'default';
+    toast(enabled ? 'Theme turned on' : 'Theme turned off');
     activeTab='shop';
   });
 }
