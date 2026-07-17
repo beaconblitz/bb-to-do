@@ -275,8 +275,6 @@
   body[data-theme="sunset"]{--primary:#fb923c;--primary-dark:#ea580c;--gold:#fde047;--surface:#3b1d2e;--surface-2:#5f2442;--border:#fdba74;}
   body[data-theme="royal"]{--primary:#a78bfa;--primary-dark:#7c3aed;--gold:#facc15;--surface:#231942;--surface-2:#372768;--border:#c4b5fd;}
   body[data-theme="ocean"]{--primary:#38bdf8;--primary-dark:#0284c7;--gold:#67e8f9;--surface:#0f2b46;--surface-2:#164e63;--border:#7dd3fc;}
-  :root,
-  :root,
   body[data-theme="default"]{
     --page-bg:
       linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
@@ -397,10 +395,9 @@
   }
 
   /* glassmorphism refresh */
-  :root,
   body[data-style="glass"]{
     --card-bg:linear-gradient(145deg,rgba(255,255,255,.16),rgba(255,255,255,.07));
-    --dash-bg:linear-gradient(145deg,rgba(255,255,255,.22),rgba(255,255,255,.08)),linear-gradient(135deg,rgba(34,211,238,.22),rgba(236,72,153,.16),rgba(250,204,21,.1));
+    --dash-bg:linear-gradient(145deg,rgba(255,255,255,.22),rgba(255,255,255,.08)),linear-gradient(135deg,color-mix(in srgb,var(--primary) 30%,transparent),color-mix(in srgb,var(--gold) 22%,transparent),color-mix(in srgb,var(--success) 14%,transparent));
     --task-bg:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.055));
     --shop-bg:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.055));
     --field-bg:rgba(4,12,28,.38);
@@ -411,9 +408,9 @@
     --shadow:var(--glass-shadow);
     --radius:16px;
     --page-bg:
-      radial-gradient(circle at 14% 12%,rgba(56,189,248,.35),transparent 30%),
-      radial-gradient(circle at 86% 18%,rgba(244,114,182,.3),transparent 32%),
-      radial-gradient(circle at 48% 92%,rgba(250,204,21,.2),transparent 30%),
+      radial-gradient(circle at 14% 12%,color-mix(in srgb,var(--primary) 40%,transparent),transparent 30%),
+      radial-gradient(circle at 86% 18%,color-mix(in srgb,var(--gold) 35%,transparent),transparent 32%),
+      radial-gradient(circle at 48% 92%,color-mix(in srgb,var(--success) 28%,transparent),transparent 30%),
       linear-gradient(135deg,#07111f 0%,#15213a 34%,#113849 66%,#2f183c 100%);
     --page-bg-size:100% 100%,100% 100%,100% 100%,100% 100%;
   }
@@ -471,27 +468,18 @@
   body:not([data-style]){
     --text:#342247;
     --muted:#6f5d87;
-    --primary:#ff6bb5;
-    --primary-dark:#8b5cf6;
-    --primary-light:#f5d9ff;
-    --gold:#f59e0b;
-    --gold-light:#fff1b8;
-    --success:#10b981;
-    --success-light:#c9ffe6;
-    --danger:#ef476f;
-    --danger-light:#ffd2de;
     --border:var(--clay-border);
-    --card-bg:linear-gradient(145deg,#ffe1ef,#d9f5ff 58%,#fff1b8);
-    --dash-bg:linear-gradient(145deg,#ffcae5,#b9ecff 52%,#fff0a8);
-    --task-bg:linear-gradient(145deg,#ffffff,#ffd9ea 48%,#d7f3ff);
-    --shop-bg:linear-gradient(145deg,#fff6c7,#ffd4e8 50%,#c9f4ff);
+    --card-bg:linear-gradient(145deg,color-mix(in srgb,var(--primary) 32%,white),color-mix(in srgb,var(--gold) 28%,white) 58%,color-mix(in srgb,var(--success) 22%,white));
+    --dash-bg:linear-gradient(145deg,color-mix(in srgb,var(--primary) 55%,white),color-mix(in srgb,var(--success) 42%,white) 52%,color-mix(in srgb,var(--gold) 55%,white));
+    --task-bg:linear-gradient(145deg,#ffffff,color-mix(in srgb,var(--primary) 30%,white) 48%,color-mix(in srgb,var(--success) 24%,white));
+    --shop-bg:linear-gradient(145deg,color-mix(in srgb,var(--gold) 34%,white),color-mix(in srgb,var(--primary) 28%,white) 50%,color-mix(in srgb,var(--success) 22%,white));
     --field-bg:#fff8fb;
-    --active-tab-bg:linear-gradient(145deg,#ffffff,#ffe29a);
-    --button-bg:linear-gradient(135deg,#ff7abf,#ffe26d 52%,#63e6be);
+    --active-tab-bg:linear-gradient(145deg,#ffffff,color-mix(in srgb,var(--gold) 55%,white));
+    --button-bg:linear-gradient(135deg,var(--primary),var(--gold) 52%,var(--success));
     --button-text:#321b42;
     --shadow:var(--clay-shadow);
     --radius:22px;
-    --page-bg:linear-gradient(135deg,#ffedf7 0%,#eaf7ff 50%,#fff8e0 100%);
+    --page-bg:linear-gradient(135deg,color-mix(in srgb,var(--primary) 18%,white) 0%,color-mix(in srgb,var(--success) 15%,white) 50%,color-mix(in srgb,var(--gold) 18%,white) 100%);
     --page-bg-size:100% 100%;
   }
   body[data-style="clay"] .card,body[data-style="clay"] .dash-header,body[data-style="clay"] .bento-tile,body[data-style="clay"] .task-card,body[data-style="clay"] .shop-card,body[data-style="clay"] .staff-tile,body[data-style="clay"] .modal,body[data-style="clay"] .coin-pill,body[data-style="clay"] .trophy-slot,body[data-style="clay"] .tab,body[data-style="clay"] input,body[data-style="clay"] textarea,body[data-style="clay"] select,body[data-style="clay"] .toast{
@@ -558,17 +546,16 @@
 
   /* ============ Skeuomorphism ============ */
   body[data-style="skeuo"]{
-    --text:#3b2a17;--muted:#8a6d4e;--primary:#b5651d;--primary-dark:#8a4513;--primary-light:#f0dcb0;
-    --gold:#c8890b;--gold-light:#f3dfa8;--success:#4c7a3d;--success-light:#dcecd2;--danger:#a13c3c;--danger-light:#f0d3d0;
-    --border:#c9a165;--radius:9px;
-    --card-bg:linear-gradient(180deg,#fdf1d8,#e8d3a3);
-    --dash-bg:linear-gradient(160deg,#a1712f,#5c3a1a);
-    --task-bg:linear-gradient(180deg,#fffaf0,#f0dfb8);
-    --shop-bg:linear-gradient(180deg,#f7e6bf,#e2c184);
-    --field-bg:#fff8ea;--button-bg:linear-gradient(180deg,#e0b563,#a5601a);--button-text:#3b2205;
-    --active-tab-bg:linear-gradient(180deg,#e6c98a,#b5651d);
+    --text:#3b2a17;--muted:#8a6d4e;
+    --border:color-mix(in srgb,var(--primary) 35%,#c9a165);--radius:9px;
+    --card-bg:linear-gradient(180deg,color-mix(in srgb,var(--gold) 20%,#fdf1d8),color-mix(in srgb,var(--primary) 20%,#e8d3a3));
+    --dash-bg:linear-gradient(160deg,color-mix(in srgb,var(--primary) 45%,#a1712f),color-mix(in srgb,var(--primary) 25%,#5c3a1a));
+    --task-bg:linear-gradient(180deg,#fffaf0,color-mix(in srgb,var(--gold) 22%,#f0dfb8));
+    --shop-bg:linear-gradient(180deg,color-mix(in srgb,var(--gold) 22%,#f7e6bf),color-mix(in srgb,var(--primary) 18%,#e2c184));
+    --field-bg:#fff8ea;--button-bg:linear-gradient(180deg,color-mix(in srgb,var(--gold) 40%,#e0b563),color-mix(in srgb,var(--primary) 35%,#a5601a));--button-text:#3b2205;
+    --active-tab-bg:linear-gradient(180deg,color-mix(in srgb,var(--gold) 30%,#e6c98a),color-mix(in srgb,var(--primary) 35%,#b5651d));
     --shadow:0 1px 0 rgba(255,255,255,.7) inset,0 -4px 8px rgba(0,0,0,.28) inset,0 8px 14px rgba(60,30,10,.4);
-    --page-bg:repeating-linear-gradient(90deg,rgba(0,0,0,.03) 0 2px,transparent 2px 4px),linear-gradient(160deg,#c99b57 0%,#8a5a2b 45%,#5c3a1a 100%);
+    --page-bg:repeating-linear-gradient(90deg,rgba(0,0,0,.03) 0 2px,transparent 2px 4px),linear-gradient(160deg,color-mix(in srgb,var(--gold) 25%,#c99b57) 0%,color-mix(in srgb,var(--primary) 30%,#8a5a2b) 45%,#5c3a1a 100%);
     --page-bg-size:auto,100% 100%;
   }
   body[data-style="skeuo"] .card,body[data-style="skeuo"] .dash-header,body[data-style="skeuo"] .bento-tile,body[data-style="skeuo"] .task-card,body[data-style="skeuo"] .shop-card,body[data-style="skeuo"] .staff-tile,body[data-style="skeuo"] .modal,body[data-style="skeuo"] .coin-pill,body[data-style="skeuo"] .trophy-slot,body[data-style="skeuo"] .tab,body[data-style="skeuo"] input,body[data-style="skeuo"] textarea,body[data-style="skeuo"] select{
@@ -585,13 +572,12 @@
 
   /* ============ Neomorphism (Soft UI) ============ */
   body[data-style="neu"]{
-    --text:#3d4457;--muted:#7c8698;--primary:#5b7fdb;--primary-dark:#3d5fc0;--primary-light:#dbe4f5;
-    --gold:#c8935a;--gold-light:#e0d3c4;--success:#4caf7d;--success-light:#d3ece0;--danger:#e0607a;--danger-light:#f2d6dd;
+    --text:#3d4457;--muted:#7c8698;
     --border:transparent;--radius:20px;
-    --card-bg:#e0e5ec;--dash-bg:#e0e5ec;--task-bg:#e0e5ec;--shop-bg:#e0e5ec;--field-bg:#e0e5ec;
-    --button-bg:#e0e5ec;--button-text:#3d4457;--active-tab-bg:#e0e5ec;
+    --card-bg:color-mix(in srgb,var(--primary) 8%,#e0e5ec);--dash-bg:color-mix(in srgb,var(--primary) 20%,#e0e5ec);--task-bg:color-mix(in srgb,var(--primary) 8%,#e0e5ec);--shop-bg:color-mix(in srgb,var(--gold) 8%,#e0e5ec);--field-bg:color-mix(in srgb,var(--primary) 8%,#e0e5ec);
+    --button-bg:color-mix(in srgb,var(--primary) 8%,#e0e5ec);--button-text:#3d4457;--active-tab-bg:color-mix(in srgb,var(--primary) 8%,#e0e5ec);
     --shadow:9px 9px 16px #a3b1c6,-9px -9px 16px #ffffff;
-    --page-bg:#e0e5ec;--page-bg-size:auto;
+    --page-bg:color-mix(in srgb,var(--primary) 8%,#e0e5ec);--page-bg-size:auto;
   }
   body[data-style="neu"]{animation:none;}
   body[data-style="neu"] .card,body[data-style="neu"] .dash-header,body[data-style="neu"] .bento-tile,body[data-style="neu"] .task-card,body[data-style="neu"] .shop-card,body[data-style="neu"] .staff-tile,body[data-style="neu"] .modal,body[data-style="neu"] .coin-pill,body[data-style="neu"] .trophy-slot,body[data-style="neu"] .tab,body[data-style="neu"] input,body[data-style="neu"] textarea,body[data-style="neu"] select{
@@ -609,11 +595,10 @@
 
   /* ============ Minimalism ============ */
   body[data-style="minimal"]{
-    --text:#18181b;--muted:#71717a;--primary:#18181b;--primary-dark:#000000;--primary-light:#f4f4f5;
-    --gold:#2563eb;--gold-light:#e8f0fe;--success:#059669;--success-light:#e6f7f1;--danger:#dc2626;--danger-light:#fbe9e9;
+    --text:#18181b;--muted:#71717a;
     --border:#e4e4e7;--radius:6px;
     --card-bg:#ffffff;--dash-bg:#ffffff;--task-bg:#ffffff;--shop-bg:#ffffff;--field-bg:#ffffff;
-    --button-bg:#18181b;--button-text:#ffffff;--active-tab-bg:#18181b;
+    --button-bg:var(--primary);--button-text:#ffffff;--active-tab-bg:var(--primary);
     --shadow:0 1px 2px rgba(0,0,0,.05);
     --page-bg:#fafafa;--page-bg-size:auto;
   }
@@ -636,17 +621,16 @@
 
   /* ============ Maximalism ============ */
   body[data-style="maximal"]{
-    --text:#fffdfb;--muted:#ffe4f5;--primary:#ff2e88;--primary-dark:#7c3aed;--primary-light:#ffd0ea;
-    --gold:#ffd60a;--gold-light:#fff3b0;--success:#00e5a0;--success-light:#c6ffee;--danger:#ff3b3b;--danger-light:#ffd2d2;
+    --text:#fffdfb;--muted:#ffe4f5;
     --border:#ffffff;--radius:16px;
-    --card-bg:linear-gradient(135deg,#ff2e88,#7c3aed 45%,#00c2ff 75%,#ffd60a 100%);
-    --dash-bg:linear-gradient(120deg,#7c3aed,#ff2e88,#ffd60a,#00c2ff);
-    --task-bg:linear-gradient(135deg,#ff2e88,#ffb703 90%);
-    --shop-bg:linear-gradient(135deg,#00c2ff,#7c3aed);
-    --field-bg:#1a0b2e;--button-bg:linear-gradient(90deg,#ff2e88,#ffd60a,#00c2ff,#7c3aed);--button-text:#0a0014;
-    --active-tab-bg:linear-gradient(135deg,#ffd60a,#ff2e88);
-    --shadow:9px 9px 0 rgba(0,0,0,.55),0 0 40px rgba(255,46,136,.5);
-    --page-bg:radial-gradient(circle at 15% 20%,rgba(255,46,136,.5),transparent 30%),radial-gradient(circle at 85% 15%,rgba(0,194,255,.45),transparent 32%),radial-gradient(circle at 50% 90%,rgba(255,214,10,.4),transparent 34%),linear-gradient(135deg,#1a0b2e 0%,#4c1d95 40%,#831843 70%,#0a0014 100%);
+    --card-bg:linear-gradient(135deg,var(--primary),var(--violet,#7c3aed) 45%,var(--success) 75%,var(--gold) 100%);
+    --dash-bg:linear-gradient(120deg,var(--violet,#7c3aed),var(--primary),var(--gold),var(--success));
+    --task-bg:linear-gradient(135deg,var(--primary),var(--gold) 90%);
+    --shop-bg:linear-gradient(135deg,var(--success),var(--violet,#7c3aed));
+    --field-bg:#1a0b2e;--button-bg:linear-gradient(90deg,var(--primary),var(--gold),var(--success),var(--violet,#7c3aed));--button-text:#0a0014;
+    --active-tab-bg:linear-gradient(135deg,var(--gold),var(--primary));
+    --shadow:9px 9px 0 rgba(0,0,0,.55),0 0 40px color-mix(in srgb,var(--primary) 55%,transparent);
+    --page-bg:radial-gradient(circle at 15% 20%,color-mix(in srgb,var(--primary) 55%,transparent),transparent 30%),radial-gradient(circle at 85% 15%,color-mix(in srgb,var(--success) 50%,transparent),transparent 32%),radial-gradient(circle at 50% 90%,color-mix(in srgb,var(--gold) 45%,transparent),transparent 34%),linear-gradient(135deg,#1a0b2e 0%,#4c1d95 40%,#831843 70%,#0a0014 100%);
     --page-bg-size:100% 100%,100% 100%,100% 100%,100% 100%;
   }
   body[data-style="maximal"] .card,body[data-style="maximal"] .dash-header,body[data-style="maximal"] .bento-tile,body[data-style="maximal"] .task-card,body[data-style="maximal"] .shop-card,body[data-style="maximal"] .staff-tile,body[data-style="maximal"] .modal,body[data-style="maximal"] .coin-pill,body[data-style="maximal"] .trophy-slot,body[data-style="maximal"] .tab,body[data-style="maximal"] input,body[data-style="maximal"] textarea,body[data-style="maximal"] select{
@@ -662,17 +646,16 @@
 
   /* ============ Liquid Glass ============ */
   body[data-style="liquid"]{
-    --text:#eaf6ff;--muted:#b9d7ff;--primary:#0a84ff;--primary-dark:#0060df;--primary-light:#cfe8ff;
-    --gold:#ffd60a;--gold-light:#5b4d0a;--success:#30d158;--success-light:#123a25;--danger:#ff453a;--danger-light:#451a17;
+    --text:#eaf6ff;--muted:#b9d7ff;
     --border:rgba(255,255,255,.55);--radius:28px;
     --card-bg:linear-gradient(135deg,rgba(255,255,255,.34),rgba(255,255,255,.08));
-    --dash-bg:linear-gradient(135deg,rgba(10,132,255,.4),rgba(255,255,255,.12));
+    --dash-bg:linear-gradient(135deg,color-mix(in srgb,var(--primary) 45%,transparent),rgba(255,255,255,.12));
     --task-bg:linear-gradient(135deg,rgba(255,255,255,.26),rgba(255,255,255,.05));
-    --shop-bg:linear-gradient(135deg,rgba(255,255,255,.28),rgba(10,132,255,.12));
+    --shop-bg:linear-gradient(135deg,rgba(255,255,255,.28),color-mix(in srgb,var(--primary) 16%,transparent));
     --field-bg:rgba(255,255,255,.14);--button-bg:linear-gradient(135deg,rgba(255,255,255,.92),rgba(255,255,255,.55));--button-text:#0a1930;
     --active-tab-bg:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.6));
     --shadow:0 10px 34px rgba(0,60,120,.4),inset 0 1px 0 rgba(255,255,255,.65);
-    --page-bg:radial-gradient(circle at 18% 16%,rgba(10,132,255,.5),transparent 32%),radial-gradient(circle at 82% 20%,rgba(191,90,242,.4),transparent 32%),radial-gradient(circle at 50% 90%,rgba(48,209,88,.3),transparent 34%),linear-gradient(140deg,#020817 0%,#071b34 50%,#0a1930 100%);
+    --page-bg:radial-gradient(circle at 18% 16%,color-mix(in srgb,var(--primary) 55%,transparent),transparent 32%),radial-gradient(circle at 82% 20%,color-mix(in srgb,var(--gold) 45%,transparent),transparent 32%),radial-gradient(circle at 50% 90%,color-mix(in srgb,var(--success) 35%,transparent),transparent 34%),linear-gradient(140deg,#020817 0%,#071b34 50%,#0a1930 100%);
     --page-bg-size:100% 100%,100% 100%,100% 100%,100% 100%;
   }
   body[data-style="liquid"] .card,body[data-style="liquid"] .dash-header,body[data-style="liquid"] .bento-tile,body[data-style="liquid"] .task-card,body[data-style="liquid"] .shop-card,body[data-style="liquid"] .staff-tile,body[data-style="liquid"] .modal,body[data-style="liquid"] .coin-pill,body[data-style="liquid"] .trophy-slot,body[data-style="liquid"] .tab,body[data-style="liquid"] input,body[data-style="liquid"] textarea,body[data-style="liquid"] select{
@@ -689,11 +672,10 @@
 
   /* ============ Bento Grid ============ */
   body[data-style="bento"]{
-    --text:#1c1c1e;--muted:#6e6e73;--primary:#ff9500;--primary-dark:#ff6200;--primary-light:#ffe6cc;
-    --gold:#ffcc00;--gold-light:#fff3cc;--success:#34c759;--success-light:#dcf7e3;--danger:#ff3b30;--danger-light:#ffdad7;
+    --text:#1c1c1e;--muted:#6e6e73;
     --border:#eef0f4;--radius:22px;
-    --card-bg:#ffffff;--dash-bg:linear-gradient(135deg,#ffd60a,#ff9500);--task-bg:#fff4e0;--shop-bg:#eaf3ff;--field-bg:#f2f2f7;
-    --button-bg:#1c1c1e;--button-text:#ffffff;--active-tab-bg:#1c1c1e;
+    --card-bg:#ffffff;--dash-bg:linear-gradient(135deg,var(--gold),var(--primary));--task-bg:color-mix(in srgb,var(--primary) 12%,white);--shop-bg:color-mix(in srgb,var(--success) 12%,white);--field-bg:#f2f2f7;
+    --button-bg:var(--primary);--button-text:#ffffff;--active-tab-bg:var(--primary);
     --shadow:0 1px 3px rgba(0,0,0,.06);
     --page-bg:#f2f2f7;--page-bg-size:auto;
   }
@@ -715,17 +697,16 @@
 
   /* ============ Spatial UI ============ */
   body[data-style="spatial"]{
-    --text:#f5f7ff;--muted:#a9b4d0;--primary:#7dd3fc;--primary-dark:#38bdf8;--primary-light:#0c3a55;
-    --gold:#fbbf24;--gold-light:#4a3a12;--success:#4ade80;--success-light:#123a25;--danger:#fb7185;--danger-light:#411a24;
+    --text:#f5f7ff;--muted:#a9b4d0;
     --border:rgba(255,255,255,.14);--radius:24px;
     --card-bg:linear-gradient(180deg,rgba(30,41,59,.72),rgba(15,23,42,.86));
-    --dash-bg:linear-gradient(160deg,rgba(56,189,248,.3),rgba(15,23,42,.88));
+    --dash-bg:linear-gradient(160deg,color-mix(in srgb,var(--primary) 35%,transparent),rgba(15,23,42,.88));
     --task-bg:linear-gradient(180deg,rgba(30,41,59,.66),rgba(15,23,42,.82));
-    --shop-bg:linear-gradient(180deg,rgba(56,189,248,.2),rgba(15,23,42,.82));
-    --field-bg:rgba(15,23,42,.6);--button-bg:linear-gradient(135deg,#38bdf8,#818cf8);--button-text:#04101f;
-    --active-tab-bg:linear-gradient(135deg,#7dd3fc,#38bdf8);
+    --shop-bg:linear-gradient(180deg,color-mix(in srgb,var(--primary) 22%,transparent),rgba(15,23,42,.82));
+    --field-bg:rgba(15,23,42,.6);--button-bg:linear-gradient(135deg,var(--primary),var(--violet,#818cf8));--button-text:#04101f;
+    --active-tab-bg:linear-gradient(135deg,var(--gold),var(--primary));
     --shadow:0 32px 60px -14px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.1);
-    --page-bg:radial-gradient(circle at 20% 20%,rgba(56,189,248,.25),transparent 32%),radial-gradient(circle at 80% 70%,rgba(129,140,248,.2),transparent 34%),linear-gradient(160deg,#020617 0%,#0b1120 55%,#0f172a 100%);
+    --page-bg:radial-gradient(circle at 20% 20%,color-mix(in srgb,var(--primary) 30%,transparent),transparent 32%),radial-gradient(circle at 80% 70%,color-mix(in srgb,var(--gold) 25%,transparent),transparent 34%),linear-gradient(160deg,#020617 0%,#0b1120 55%,#0f172a 100%);
     --page-bg-size:100% 100%,100% 100%,100% 100%;
   }
   body[data-style="spatial"] .card,body[data-style="spatial"] .dash-header,body[data-style="spatial"] .bento-tile,body[data-style="spatial"] .task-card,body[data-style="spatial"] .shop-card,body[data-style="spatial"] .staff-tile,body[data-style="spatial"] .modal,body[data-style="spatial"] .coin-pill,body[data-style="spatial"] .trophy-slot,body[data-style="spatial"] .tab,body[data-style="spatial"] input,body[data-style="spatial"] textarea,body[data-style="spatial"] select{
